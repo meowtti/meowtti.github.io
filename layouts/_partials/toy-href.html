@@ -1,0 +1,4 @@
+{{- /* 놀이 주소 한 곳 — 목록 파일에 link가 있으면 따로 올린 저장소 주소, 없으면 이 저장소 static/toys/<이름>/ */ -}}
+{{- $href := printf "/toys/%s/" .File.ContentBaseName | relURL -}}
+{{- with .Params.link }}{{ $href = . }}{{ end -}}
+{{- return $href -}}

@@ -1,8 +1,8 @@
-{{- /* 놀이 목록 한 곳 — 받는 것: 놀이 목록 항목들. 놀이 본체는 static/toys/<목록 파일 이름>/ 에 그대로 있고, 새 창으로 연다.
-       목록 파일 칸: title · date · description · thumb(선택) · sound = true(소리가 나면) */ -}}
+{{- /* 놀이 목록 한 곳 — 받는 것: 놀이 목록 항목들. 놀이 본체는 따로 올린 저장소(link) 또는 static/toys/<이름>/ — 새 창으로 연다.
+       목록 파일 칸: title · date · description · link · thumb(선택) · sound = true(소리가 나면) */ -}}
 <ul class="toys">
 {{- range $i, $p := . }}
-  {{- $href := printf "/toys/%s/" .File.ContentBaseName | relURL }}
+  {{- $href := partial "toy-href.html" . }}
   <li>
     {{- with .Params.thumb }}
     <a class="thumb" href="{{ $href }}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="{{ . | relURL }}" alt="" width="240" height="150"{{ if gt $i 0 }} loading="lazy"{{ end }}></a>

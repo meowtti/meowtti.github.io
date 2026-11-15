@@ -38,7 +38,9 @@ def test_blocks_disallowed_extension(tmp_path, name):
     assert any("확장자" in m for m in problems), problems
 
 
-@pytest.mark.parametrize("name", ["index.html", "style.css", "app.js", "works.json", "post.md", "logo.svg"])
+@pytest.mark.parametrize(
+    "name", ["index.html", "style.css", "app.js", "works.json", "post.md", "logo.svg", ".nojekyll"]
+)
 def test_allows_site_files(tmp_path, name):
     p = _write(tmp_path, name, "hello")
     assert guard.check_file(p) == []
@@ -156,3 +158,46 @@ def test_main_exit_codes(tmp_path, capsys):
     assert guard.main([str(good), str(bad)]) == 1
     out = capsys.readouterr().out
     assert "cv.pdf" in out and "고치는 법" in out
+
+
+# ── 소리: 놀이 속 효과음 · 배경 음악은 올리되, 크기와 꼬리표(태그) 속 경로를 본다 ──────
+
+
+@pytest.mark.parametrize("name", ["bgm/a.mp3", "sfx/b.ogg"])
+def test_allows_small_clean_audio(tmp_path, name):
+    p = _write(tmp_path, name, b"ID3\x04\x00" + b"\x00" * 2000 + b"TSSE Lavf61")
+    assert guard.check_file(p) == []
+
+
+def test_blocks_big_audio(tmp_path):
+    p = _write(tmp_path, "bgm/long.mp3", b"\x00" * (guard.AUDIO_MAX_BYTES + 1))
+    assert any("크기" in m for m in guard.check_file(p))
+
+
+def test_blocks_local_path_inside_audio_tag(tmp_path):
+    tag = ("Q:" + BS + "Users" + BS + "someone" + BS + "song.wav").encode("utf-8")
+    p = _write(tmp_path, "sfx/c.mp3", b"ID3\x04\x00" + tag + b"\x00" * 100)
+    assert any("경로" in m for m in guard.check_file(p))
+
+
+def test_blocks_private_word_inside_audio_tag(tmp_path, monkeypatch):
+    words = tmp_path / "words.txt"
+    words.write_text("비밀낱말\n", encoding="utf-8")
+    monkeypatch.setattr(guard, "PRIVATE_WORDS_FILE", words)
+    p = _write(tmp_path, "sfx/d.ogg", b"OggS" + "ARTIST=비밀낱말".encode("utf-8") + b"\x00" * 100)
+    assert any("금지어" in m for m in guard.check_file(p))
+
+
+def test_random_audio_bytes_are_not_paths(tmp_path):
+    # 실제로 걸렸던 꼴(2026-11-15 첫 놀이 소리 14개): 압축 바이트 속 우연한 「글자:/」 + 제어 문자
+    noise = (
+        b"\xff\xfb\x90"
+        + b"C"
+        + b":/[\x17Qybqp@_Y\x15q"
+        + b"\x00\x81"
+        + b"v"
+        + b":/sdtYej`?4(\xdb\x91-\x1a"
+        + b"\x00" * 50
+    )
+    p = _write(tmp_path, "bgm/e.mp3", noise)
+    assert guard.check_file(p) == []

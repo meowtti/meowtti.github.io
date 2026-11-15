@@ -140,13 +140,30 @@ def _toy_entries() -> list[Path]:
     return [p for p in d.glob("*.md") if p.name != "_index.md"] if d.exists() else []
 
 
+TOY_REPO_LINK = re.compile(r"^https://meowtti\.github\.io/[a-z0-9-]+/$")
+
+
+def _toy_href(md: Path) -> str:
+    """놀이 주소 — 틀(_partials/toy-href.html)과 같은 규칙: link가 있으면 따로 올린 저장소, 없으면 /toys/<이름>/."""
+    return _front(md).get("link") or f"/toys/{md.stem}/"
+
+
 def test_every_toy_entry_points_at_real_files():
     for md in _toy_entries():
         slug = md.stem
-        assert (ROOT / "static" / "toys" / slug / "index.html").is_file(), (
-            f"content/toys/{md.name} 이(가) 가리키는 static/toys/{slug}/index.html 이 없음 — 놀이 폴더 이름 = 목록 파일 이름"
-        )
         front = _front(md)
+        link = front.get("link")
+        if link:
+            assert TOY_REPO_LINK.match(link), (
+                f"content/toys/{md.name}: link {link!r} — 같은 계정 놀이 저장소 주소(https://meowtti.github.io/<저장소>/)만"
+            )
+            assert not (ROOT / "static" / "toys" / slug).exists(), (
+                f"{md.name}: 따로 올린 놀이인데 static/toys/{slug}/ 사본이 남아 있음 — 한 곳에만"
+            )
+        else:
+            assert (ROOT / "static" / "toys" / slug / "index.html").is_file(), (
+                f"content/toys/{md.name} 이(가) 가리키는 static/toys/{slug}/index.html 이 없음 — 놀이 폴더 이름 = 목록 파일 이름"
+            )
         for key in ("title", "date", "description"):
             assert front.get(key), f"content/toys/{md.name}: {key} 칸이 비었음"
         thumb = front.get("thumb")
@@ -157,17 +174,23 @@ def test_every_toy_entry_points_at_real_files():
 
 
 def test_toy_links_open_in_new_window(built):
-    found = 0
+    hrefs = {_toy_href(md) for md in _toy_entries()}
+    found = set()
     for p in built.rglob("*.html"):
-        for tag in re.findall(r'<a\b[^>]*href="?/toys/[^"\s>]+/"?[^>]*>', p.read_text(encoding="utf-8")):
-            found += 1
+        for tag in re.findall(r"<a\b[^>]*>", p.read_text(encoding="utf-8")):
+            m = re.search(r'href="?([^"\s>]+)', tag)
+            if not m or m.group(1) not in hrefs:
+                continue
+            found.add(m.group(1))
             assert 'target="_blank"' in tag or "target=_blank" in tag, f"{p}: 놀이 링크가 새 창이 아님 {tag}"
             assert "noopener" in tag, f"{p}: 새 창 링크에 noopener가 없음 {tag}"
-    assert found >= len(_toy_entries()), "목록 파일보다 놀이 링크가 적음"
+    assert found == hrefs, f"목록에 있는데 화면에 링크가 없는 놀이: {hrefs - found}"
 
 
 def test_toy_entries_have_no_page_of_their_own(built):
     for md in _toy_entries():
+        if _front(md).get("link"):
+            continue
         page = built / "toys" / md.stem / "index.html"
         src = ROOT / "static" / "toys" / md.stem / "index.html"
         assert page.read_bytes() == src.read_bytes(), f"{md.name}: 목록 항목이 놀이 자리에 페이지를 덮어씀"
@@ -189,6 +212,13 @@ def test_korean_404_page(built):
     text = page.read_text(encoding="utf-8")
     assert 'href="/"' in text, "404에 첫 화면으로 가는 링크가 없음"
     assert "Page not found" not in text, "404 탭 제목 · og 제목이 Hugo 기본 영어"
+
+
+def test_icons_linked_and_present(built):
+    html = (built / "index.html").read_text(encoding="utf-8")
+    for name in ("favicon-32.png", "apple-touch-icon.png"):
+        assert name in html, f"첫 화면 머리에 {name} 링크가 없음"
+        assert (built / name).is_file(), f"{name} 파일이 굽기에 없음(static/)"
 
 
 def test_home_link_preview_has_image(built):
