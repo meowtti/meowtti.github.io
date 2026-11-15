@@ -214,6 +214,15 @@ def test_korean_404_page(built):
     assert "Page not found" not in text, "404 탭 제목 · og 제목이 Hugo 기본 영어"
 
 
+def test_github_profile_links_open_new_tab(built):
+    github = tomllib.loads((ROOT / "hugo.toml").read_text(encoding="utf-8"))["params"]["github"]
+    html = (built / "index.html").read_text(encoding="utf-8")
+    tags = [t for t in re.findall(r"<a\b[^>]*>", html) if github in t]
+    assert len(tags) >= 2, "첫 화면에 깃허브 링크가 둘(소개 · 바닥글) 있어야 함"
+    for t in tags:
+        assert "_blank" in t and "noopener" in t, f"깃허브 링크가 새 탭 · noopener가 아님 {t}"
+
+
 def test_icons_linked_and_present(built):
     html = (built / "index.html").read_text(encoding="utf-8")
     for name in ("favicon-32.png", "apple-touch-icon.png"):

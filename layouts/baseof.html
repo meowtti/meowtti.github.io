@@ -48,7 +48,7 @@
   <p>따로 밝힌 것을 빼고, 이 사이트의 글과 그림, 놀이는 <a rel="license" href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko">CC BY-NC 4.0</a>을 따릅니다.
   출처를 밝히면 자유롭게 나누고 고쳐 써도 되지만, 영리 목적으로는 쓸 수 없습니다.</p>
   {{- with site.Home.OutputFormats.Get "rss" }}
-  <p><a href="{{ .RelPermalink }}">RSS</a></p>
+  <p><a href="{{ .RelPermalink }}">RSS</a>{{ with site.Params.github }} · <a href="{{ . }}" target="_blank" rel="noopener">깃허브</a>{{ end }}</p>
   {{- end }}
 </footer>
 </body>

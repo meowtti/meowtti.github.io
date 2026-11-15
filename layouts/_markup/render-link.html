@@ -1,0 +1,5 @@
+{{- /* 글 속 링크 한 곳 — 바깥 주소(이 사이트 밖)는 새 탭으로 연다 */ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $outside := and $u.IsAbs (ne $u.Host (urls.Parse site.BaseURL).Host) -}}
+<a href="{{ .Destination | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $outside }} target="_blank" rel="noopener"{{ end }}>{{ .Text }}</a>
+{{- /**/ -}}

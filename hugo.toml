@@ -3,6 +3,9 @@ locale = "ko"
 title = "야옹띠의 놀이터"
 disableHugoGeneratorInject = true
 
+[params]
+  github = "https://github.com/meowtti"
+
 # 판 고정 — 여기 한 곳. 올릴 땐 min · max를 같이 바꾸고 tests/test_site.py로 굽기를 다시 본다.
 [module.hugoVersion]
   min = "0.170.0"
