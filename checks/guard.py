@@ -75,6 +75,19 @@ def _has_exif(data: bytes, ext: str) -> bool:
     return False
 
 
+_DRAFT_TRUE = re.compile(r"^\s*draft\s*[=:]\s*true\s*$", re.IGNORECASE | re.MULTILINE)
+
+
+def _is_draft(text: str) -> bool:
+    """글 맨 앞 머리(+++ … +++ 또는 --- … ---) 안에 draft = true가 있나 — 본문 글자는 안 본다."""
+    for fence in ("+++", "---"):
+        if text.startswith(fence):
+            end = text.find("\n" + fence, len(fence))
+            if end != -1:
+                return bool(_DRAFT_TRUE.search(text[len(fence) : end]))
+    return False
+
+
 def _private_words() -> list[str]:
     try:
         lines = PRIVATE_WORDS_FILE.read_text(encoding="utf-8").splitlines()
@@ -106,6 +119,10 @@ def check_file(path: Path) -> list[str]:
         text = data.decode("utf-8", errors="ignore")
         if any(p.search(text) for p in LOCAL_PATH_PATTERNS):
             problems.append("글에 내 PC 경로(드라이브 · 사용자 폴더)가 들어 있음 — 상대 경로로 바꾼다")
+        if ext == ".md" and _is_draft(text.lstrip("﻿")):
+            problems.append(
+                "초안(draft = true) 글 — 공개 저장소라 올리면 누구나 본다. 다 쓰면 draft를 지우고 올린다(그전엔 PC에만)"
+            )
         low = text.lower()
         if any(w in low for w in _private_words()):
             problems.append(

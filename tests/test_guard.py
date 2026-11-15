@@ -102,6 +102,30 @@ def test_web_urls_and_css_are_not_paths(tmp_path):
     assert guard.check_file(p) == []
 
 
+# ── 초안 글은 공개 저장소에 안 올림 ─────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "head",
+    [
+        '+++\ntitle = "쓰는 중"\ndraft = true\n+++\n본문',
+        "---\ntitle: 쓰는 중\ndraft: true\n---\n본문",
+    ],
+)
+def test_blocks_draft_posts(tmp_path, head):
+    p = _write(tmp_path, "content/posts/wip.md", head)
+    assert any("초안" in m for m in guard.check_file(p))
+
+
+def test_allows_finished_post(tmp_path):
+    p = _write(
+        tmp_path,
+        "content/posts/done.md",
+        '+++\ntitle = "다 씀"\ndraft = false\n+++\n본문에 draft = true 라는 글자가 있어도 머리 밖이면 괜찮다',
+    )
+    assert guard.check_file(p) == []
+
+
 # ── 저장소 밖 비공개 금지어 파일 ─────────────────────────────
 
 
