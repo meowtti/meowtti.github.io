@@ -1,7 +1,8 @@
 """새 놀이 저장소 도구 — 놀이 하나 = 저장소 하나(CLAUDE.md 규칙 3)를 명령 셋으로.
 
   prepare <이름> [--folders img bgm] [--files app.js]   옆 폴더(../<이름>)에 뼈대를 차린다 — 로컬만
-  publish <이름> --confirm [--description 글]            깃허브 저장소 만들기(없을 때) → push → Pages 켜기
+  publish <이름> --confirm --audit "감사 결과" [--description 글]
+                                                          깃허브 저장소 만들기(없을 때) → push → Pages 켜기
                                                           → 굽기 기다리기 → 실제 주소 확인  ※ 공개로 나간다
   check <이름>                                           실제 주소에서 올린 파일이 다 뜨나만 본다
 
@@ -199,7 +200,9 @@ def prepare(
     if "--config=.pre-commit-config.yaml" not in hook.read_text(encoding="utf-8", errors="ignore"):
         raise SystemExit("⛔ 커밋 전 검사가 이 폴더 설정을 안 가리킴")
     print("  + 커밋 전 검사 켬(이 폴더 안)")
-    print("다음: 본체를 넣고 git add · commit(검사가 돈다) → 주인 「올려」 뒤 publish --confirm")
+    print(
+        "다음: 본체를 넣고 git add · commit(검사가 돈다) → 독립 감사 → 주인 「올려」 뒤 publish --confirm --audit"
+    )
     return target
 
 
@@ -282,6 +285,9 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("name")
     q.add_argument("--description", default="")
     q.add_argument("--confirm", action="store_true")
+    q.add_argument(
+        "--audit", default="", help="올리기 전 독립 감사 결과 한 줄(예: 「❗0 ⚠️6 → 고친 뒤 반영」)"
+    )
     c = sub.add_parser("check")
     c.add_argument("name")
     a = ap.parse_args(argv)
@@ -292,6 +298,13 @@ def main(argv: list[str] | None = None) -> int:
         if not a.confirm:
             print("⛔ 공개로 나가는 단계 — 주인이 「올려」 한 뒤에만 --confirm을 붙인다")
             return 2
+        if len(a.audit.strip()) < 5:
+            print(
+                "⛔ 올리기 전 독립 감사가 한 번 이상 있어야 한다(CLAUDE.md 규칙 3 · 2026-11-16 주인)"
+                " — 결론을 안 보여 준 일꾼의 감사 결과 한 줄을 --audit에 적는다"
+            )
+            return 2
+        print(f"감사: {a.audit.strip()}")
         return publish(a.name, a.description)
     return check(a.name)
 

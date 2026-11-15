@@ -66,6 +66,14 @@ def test_publish_needs_confirm(capsys):
     assert "--confirm" in capsys.readouterr().out
 
 
+@pytest.mark.parametrize("audit", [None, "", "   ", "ok"])
+def test_publish_needs_independent_audit(capsys, audit):
+    # 올리기 전 독립 감사 한 번 이상(2026-11-16 주인) — 결과 한 줄이 없으면 공개 단계로 안 간다
+    args = ["publish", "demo", "--confirm"] + ([] if audit is None else ["--audit", audit])
+    assert toy.main(args) != 0
+    assert "감사" in capsys.readouterr().out
+
+
 @pytest.mark.parametrize("bad", ["", "../x", "a/b", "Demo", "-x", "meowtti.github.io"])
 def test_bad_names_refused(bad):
     with pytest.raises(SystemExit):
