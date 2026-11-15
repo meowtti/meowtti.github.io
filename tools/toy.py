@@ -1,4 +1,4 @@
-"""새 놀이 저장소 도구 — 놀이 하나 = 저장소 하나(CLAUDE.md 규칙 3)를 명령 셋으로.
+"""새 놀이 저장소 도구 — 놀이 하나 = 저장소 하나(작업 규칙 3)를 명령 셋으로.
 
   prepare <이름> [--folders img bgm] [--files app.js]   옆 폴더(../<이름>)에 뼈대를 차린다 — 로컬만
   publish <이름> --confirm --audit "감사 결과" [--description 글]
@@ -300,7 +300,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         if len(a.audit.strip()) < 5:
             print(
-                "⛔ 올리기 전 독립 감사가 한 번 이상 있어야 한다(CLAUDE.md 규칙 3 · 2026-11-16 주인)"
+                "⛔ 올리기 전 독립 감사가 한 번 이상 있어야 한다(작업 규칙 3 · 2026-11-16 주인)"
                 " — 결론을 안 보여 준 일꾼의 감사 결과 한 줄을 --audit에 적는다"
             )
             return 2

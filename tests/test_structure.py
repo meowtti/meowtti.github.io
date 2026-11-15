@@ -47,6 +47,7 @@ def _ignored(path: str) -> bool:
         "public/index.html",
         "resources/_gen/x.css",
         ".hugo_build.lock",
+        "CLAUDE.md",  # 작업 규칙은 PC에만(2026-11-16 주인)
     ],
 )
 def test_junk_is_ignored(path):
@@ -60,7 +61,6 @@ def test_junk_is_ignored(path):
         ".gitattributes",
         ".pre-commit-config.yaml",
         "README.md",
-        "CLAUDE.md",
         "pyproject.toml",
         "uv.lock",
         ".python-version",

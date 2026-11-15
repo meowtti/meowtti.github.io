@@ -6,7 +6,7 @@
 !/.gitattributes
 !/.pre-commit-config.yaml
 !/README.md
-!/CLAUDE.md
+# CLAUDE.md(작업 규칙)는 PC에만 둔다 — 열지 않는다(2026-11-16 주인 · 지난 기록에서도 지움)
 !/pyproject.toml
 !/uv.lock
 !/.python-version
