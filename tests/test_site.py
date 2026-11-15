@@ -114,6 +114,13 @@ def test_drafts_not_built(built):
                 assert title not in p.read_text(encoding="utf-8"), f"초안 「{title}」이 {p}에 나옴"
 
 
+def test_no_accidental_strikethrough(built):
+    """한 줄에 물결표(~)가 둘이면 마크다운이 그 사이를 취소선으로 그린다(2026-11-16 일지 「23~32초 … 6~8개」가 지운 글자로 나옴).
+    범위 물결표는 \\~로 쓴다. 일부러 지운 글자(~~)를 쓰게 되면 이 시험을 그 글만 빼도록 고친다."""
+    for p in built.rglob("*.html"):
+        assert "<del>" not in p.read_text(encoding="utf-8"), f"{p}에 취소선 — 같은 줄 물결표 둘이면 \\~로"
+
+
 def test_home_title_not_doubled(built):
     html = (built / "index.html").read_text(encoding="utf-8")
     m = re.search(r"<title>(.*?)</title>", html)
