@@ -50,6 +50,8 @@
   {{- with site.Home.OutputFormats.Get "rss" }}
   <p><a href="{{ .RelPermalink }}">RSS</a>{{ with site.Params.github }} · <a href="{{ . }}" target="_blank" rel="noopener">깃허브</a>{{ end }}</p>
   {{- end }}
+  <p id="fun" hidden></p>
 </footer>
+{{ partial "tricks.html" . }}
 </body>
 </html>

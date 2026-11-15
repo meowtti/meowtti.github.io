@@ -1,0 +1,53 @@
+{{- /* 놀이터 장난 한 곳 — 바깥 스크립트 없음 · 저장은 이 브라우저에만(키 머리말 meowtti-) · 아무것도 안 보냄.
+       ① 탭 낮잠: 다른 탭으로 가면 「야옹… 어디 가?」 + 졸린 아이콘, 돌아오면 1.5초 「야옹! 왔다」
+       ② 밤엔 졸린 아이콘(방문자 시계 22~6시)
+       ③ 이스터에그: ㅇㅑㅇㅗㅇ(두벌식 키 D K D H D)을 치면 10초 「시로 출현?!」 + 시로 도장
+       ④ 바닥글: 이 브라우저로 몇 번째 방문인지(창을 새로 열 때만 셈) · 즐겨찾기 안내 단추 */ -}}
+<script>
+(function () {
+  var icon = document.querySelector('link[rel="icon"]');
+  if (!icon || !document.addEventListener) return;
+  var title = document.title, awake = icon.href,
+      sleep = "{{ "favicon-sleep-32.png" | relURL }}", egg = "{{ "favicon-egg-32.png" | relURL }}",
+      timer = null, eggOn = false;
+  function night() { var h = new Date().getHours(); return h >= 22 || h < 6; }
+  function rest() { icon.href = night() ? sleep : awake; }
+  rest();
+
+  document.addEventListener("visibilitychange", function () {
+    if (eggOn) return;
+    clearTimeout(timer);
+    if (document.hidden) { document.title = "야옹… 어디 가?"; icon.href = sleep; }
+    else { document.title = "야옹! 왔다"; rest(); timer = setTimeout(function () { document.title = title; }, 1500); }
+  });
+
+  var want = "KeyD,KeyK,KeyD,KeyH,KeyD", keys = [];
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || e.ctrlKey || e.metaKey || e.altKey) return;
+    keys.push(e.code); if (keys.length > 5) keys.shift();
+    if (keys.join(",") !== want) return;
+    keys = []; eggOn = true; clearTimeout(timer);
+    document.title = "시로 출현?!"; icon.href = egg;
+    timer = setTimeout(function () { eggOn = false; document.title = title; rest(); }, 10000);
+  });
+
+  var line = document.getElementById("fun");
+  if (!line) return;
+  var n = 0;
+  try {
+    n = parseInt(localStorage.getItem("meowtti-visits"), 10) || 0;
+    if (!sessionStorage.getItem("meowtti-counted")) { n += 1; localStorage.setItem("meowtti-visits", n); sessionStorage.setItem("meowtti-counted", "1"); }
+  } catch (err) { n = 0; }
+  var btn = document.createElement("button");
+  btn.type = "button"; btn.className = "fav-btn"; btn.textContent = "★ 즐겨찾기에 추가";
+  btn.addEventListener("click", function () {
+    var touch = "ontouchstart" in window, mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    btn.textContent = touch ? "브라우저 메뉴 → 「홈 화면에 추가」를 눌러 주세요" : (mac ? "⌘+D" : "Ctrl+D") + "를 눌러 주세요";
+    setTimeout(function () { btn.textContent = "★ 즐겨찾기에 추가"; }, 4000);
+  });
+  if (n > 0) line.appendChild(document.createTextNode("이 브라우저로 " + n + "번째 방문 · "));
+  line.appendChild(btn);
+  line.hidden = false;
+})();
+</script>

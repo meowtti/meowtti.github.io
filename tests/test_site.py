@@ -237,6 +237,16 @@ def test_fonts_ship_with_their_license(built):
         )
 
 
+def test_tricks_icons_exist_and_footer_slot(built):
+    html = (built / "index.html").read_text(encoding="utf-8")
+    assert 'id="fun"' in html, "바닥글 장난 줄 자리(id=fun)가 없음"
+    for name in re.findall(r'"/?(favicon-[a-z]+-32\.png)"', html):
+        assert (built / name).is_file(), f"장난 스크립트가 부르는 {name} 이 굽기에 없음"
+    assert "favicon-sleep-32.png" in html and "favicon-egg-32.png" in html, (
+        "탭 낮잠 · 이스터에그 아이콘 줄이 빠짐"
+    )
+
+
 def test_icons_linked_and_present(built):
     html = (built / "index.html").read_text(encoding="utf-8")
     for name in ("favicon-32.png", "apple-touch-icon.png"):
