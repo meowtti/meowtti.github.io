@@ -9,6 +9,17 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def test_precommit_hook_uses_this_repo_config():
+    """커밋 직전 검사가 이 저장소 설정으로 걸려 있나 — 다른 저장소 설정으로 바뀌면 시험 없이 커밋이 지나간다(2026-11-15 실제로 남)."""
+    hook = ROOT / ".git" / "hooks" / "pre-commit"
+    if not hook.exists():
+        pytest.skip("커밋 직전 검사가 안 켜짐(이 PC 밖) — 켜기: uv run --frozen pre-commit install")
+    text = hook.read_text(encoding="utf-8", errors="ignore")
+    assert "--config=.pre-commit-config.yaml" in text, (
+        "커밋 직전 검사가 다른 설정을 가리킴 — 이 폴더에서 uv run --frozen pre-commit install 다시"
+    )
+
+
 def _ignored(path: str) -> bool:
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     r = subprocess.run(
