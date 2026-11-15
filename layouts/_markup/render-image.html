@@ -1,0 +1,8 @@
+{{- /* 글 속 그림 한 곳 — 제목으로 글 줄 안 32px 작은 그림을 단다(그림은 static/stamps/)
+       "작게" = 매끈한 그림(예: ![시로](/stamps/fox-sweat-64.png "작게"))
+       "도장" = 점 그림 — 각지게 키움(예: ![시로 도장](/stamps/siro-32.png "도장")) */ -}}
+{{- if or (eq .Title "작게") (eq .Title "도장") -}}
+<img class="mini{{ if eq .Title "도장" }} pixel{{ end }}" src="{{ .Destination | safeURL }}" alt="{{ .Text }}" width="32" height="32">
+{{- else -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- end -}}
