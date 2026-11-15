@@ -6,6 +6,10 @@ disableHugoGeneratorInject = true
 [params]
   github = "https://github.com/meowtti"
 
+# 글자를 쓴 그대로 — 「....」를 「…」로, 따옴표를 둥근 따옴표로 바꾸지 않는다(주인 말투 보존 · 2026-11-15 첫 글에서 걸림)
+[markup.goldmark.extensions.typographer]
+  disable = true
+
 # 판 고정 — 여기 한 곳. 올릴 땐 min · max를 같이 바꾸고 tests/test_site.py로 굽기를 다시 본다.
 [module.hugoVersion]
   min = "0.170.0"
