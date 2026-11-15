@@ -7,6 +7,16 @@ title = "야옹띠의 놀이터"
   min = "0.170.0"
   max = "0.170.0"
 
+# 방문 통계 — Cloudflare 웹 통계(쿠키 없음). 값은 여기 한 곳.
+# site: 사이트 표(공개되는 값 — 방문자 누구나 페이지 소스에서 봄 · 비밀 아님)
+# sri: beacon.min.js 지문. Cloudflare가 파일을 바꾸면 브라우저가 막아 통계만 멈춘다(사이트는 그대로).
+#      그때 새 지문으로 바꾼다: curl -s <src> | openssl dgst -sha384 -binary | openssl base64 -A
+[params.analytics]
+  src = "https://static.cloudflareinsights.com/beacon.min.js"
+  site = "3973a2249ca048d1b10cfc28433289bc"
+  sri = "sha384-DSBfgE0somecFTMgit0M4sNXN8O0JQ/LGM3DGGPVvgXIPZvW+H1zSYjc6O83LLBv"
+  measured = "2026-11-15 · ETag 2026.10.1"
+
 [taxonomies]
   tag = "tags"
 

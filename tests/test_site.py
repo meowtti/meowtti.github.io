@@ -54,12 +54,49 @@ def test_home_page_built(built):
     assert "야옹띠의 놀이터" in html
 
 
-def test_no_external_scripts(built):
+def _analytics() -> dict:
+    return tomllib.loads((ROOT / "hugo.toml").read_text(encoding="utf-8"))["params"]["analytics"]
+
+
+def test_only_pinned_analytics_script_outside(built):
+    allowed = _analytics()["src"]
     for p in built.rglob("*.html"):
         text = p.read_text(encoding="utf-8")
-        srcs = re.findall(r'<script[^>]+src="([^"]+)"', text)
-        outside = [s for s in srcs if s.startswith(("http:", "https:", "//"))]
-        assert not outside, f"{p.name}: 바깥 스크립트 {outside} — 원칙 2(저장소 안에 복사)"
+        for tag in re.findall(r"<script\b[^>]*>", text):
+            m = re.search(r'src="?([^"\s>]+)', tag)
+            if not m or not m.group(1).startswith(("http:", "https:", "//")):
+                continue
+            assert m.group(1) == allowed, f"{p.name}: 허락 안 된 바깥 스크립트 {m.group(1)} — 원칙 2"
+            assert "integrity=" in tag and "sha384-" in tag, f"{p.name}: 통계 스크립트에 지문(SRI)이 없음"
+            assert "crossorigin=" in tag, f"{p.name}: 지문 검사엔 crossorigin이 있어야 함"
+
+
+def test_analytics_on_every_page_in_production(built):
+    site = _analytics()["site"]
+    pages = list(built.rglob("*.html"))
+    assert pages
+    for p in pages:
+        assert site in p.read_text(encoding="utf-8"), f"{p.name}: 통계 줄이 빠짐"
+
+
+def test_no_analytics_in_local_preview(tmp_path):
+    r = subprocess.run(
+        [
+            _hugo(),
+            "--source",
+            str(ROOT),
+            "--destination",
+            str(tmp_path),
+            "--quiet",
+            "--environment",
+            "development",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 0, r.stdout + r.stderr
+    for p in tmp_path.rglob("*.html"):
+        assert "cloudflareinsights" not in p.read_text(encoding="utf-8"), f"{p.name}: 미리 보기에 통계가 붙음"
 
 
 def test_drafts_not_built(built):

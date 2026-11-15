@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ .Title }} · {{ site.Title }}</title>
 {{ with site.Home.OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}">{{ end }}
+{{- if hugo.IsProduction }}{{ with site.Params.analytics }}
+<script type="module" src="{{ .src }}" integrity="{{ .sri }}" crossorigin="anonymous" data-cf-beacon='{"token": "{{ .site }}"}'></script>
+{{- end }}{{ end }}
 </head>
 <body>
 <header><a href="/">{{ site.Title }}</a></header>
