@@ -1,0 +1,37 @@
+# 커밋 직전 검사 — 걸리면 커밋이 멈춘다. 건너뛰기(--no-verify) 금지: 고치고 다시 커밋한다.
+# 켜기(한 번): uv run --frozen pre-commit install      지금 돌려 보기: uv run --frozen pre-commit run --all-files
+repos:
+  - repo: local
+    hooks:
+      - id: uv-sync-check
+        name: uv sync --check — 도구 폴더가 uv.lock과 맞나 (다르면 uv sync --frozen)
+        entry: uv sync --frozen --check --quiet
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: guard
+        name: guard — 올리면 안 되는 꼴 · 크기 · 사진 EXIF · 내 PC 경로 · 비공개 금지어
+        entry: .venv\\Scripts\\python.exe checks/guard.py
+        language: system
+      - id: gitleaks
+        name: gitleaks — 열쇠 · 비밀번호 무늬 (값은 가림)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner --log-level warn -v .
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff
+        name: ruff — 파이썬 맞춤법
+        entry: .venv\\Scripts\\ruff.exe check --force-exclude
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format — 파이썬 모양 검사 (고쳐 쓰지는 않음 · 걸리면 uv run ruff format)
+        entry: .venv\\Scripts\\ruff.exe format --check --force-exclude
+        language: system
+        types: [python]
+      - id: pytest
+        name: pytest — 시험 전부
+        entry: .venv\\Scripts\\python.exe -m pytest -q -p no:cacheprovider
+        language: system
+        pass_filenames: false
+        always_run: true

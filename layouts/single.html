@@ -1,0 +1,8 @@
+{{ define "main" }}
+<article>
+  <h1>{{ .Title }}</h1>
+  <time>{{ .Date.Format "2006년 1월 2일" }}</time>
+  {{ .Content }}
+  <p>{{ range .GetTerms "tags" }}<a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a> {{ end }}</p>
+</article>
+{{ end }}

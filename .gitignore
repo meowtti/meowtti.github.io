@@ -1,0 +1,36 @@
+# 허락 목록 — 모두 막고, 올려도 되는 것만 연다.
+# 새 폴더 · 새 맨 위 파일을 올리려면 여기에 `!` 줄을 더한다 (tests/test_structure.py가 지킨다).
+# 까닭: 「빼는 목록」은 하나 빠뜨리면 그 파일이 공개 저장소에 그대로 올라간다.
+/*
+!/.gitignore
+!/.gitattributes
+!/.pre-commit-config.yaml
+!/README.md
+!/CLAUDE.md
+!/pyproject.toml
+!/uv.lock
+!/.python-version
+!/checks/
+!/tests/
+!/.github/
+# Hugo 원료 — 구운 결과(public/ · resources/ · .hugo_build.lock)는 위 /* 줄이 막는다
+!/hugo.toml
+!/layouts/
+!/content/
+!/static/
+
+# 어느 폴더 안이든 막는 것 — 운영체제 쓰레기 · 캐시 · 비밀 · 묶음 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+.env
+.env.*
+node_modules/
+*.zip
+*.7z
+*.rar

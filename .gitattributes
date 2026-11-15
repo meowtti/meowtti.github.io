@@ -1,0 +1,9 @@
+# 줄바꿈을 저장소 안에서는 LF로 맞춘다 (윈도에서 고쳐도 기록이 어지럽지 않게)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.woff2 binary

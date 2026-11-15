@@ -1,0 +1,27 @@
+[project]
+name = "meowtti-site"
+version = "0.0.0"
+description = "야옹띠의 놀이터 — 정적 사이트 (파이썬은 검사 · 굽기 도구로만 쓴다)"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+# 좁게 시작 — 정의 안 된 이름 · 문법 오류 · 오류를 삼키는 except · 변하는 기본값
+select = ["F", "E9", "BLE001", "B006", "B008"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.7.0",
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]
