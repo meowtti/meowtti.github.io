@@ -11,6 +11,7 @@
 !/uv.lock
 !/.python-version
 !/checks/
+!/tools/
 !/tests/
 !/.github/
 # Hugo 원료 — 구운 결과(public/ · resources/ · .hugo_build.lock)는 위 /* 줄이 막는다

@@ -65,6 +65,7 @@ def test_junk_is_ignored(path):
         "uv.lock",
         ".python-version",
         "checks/guard.py",
+        "tools/toy.py",
         "tests/test_guard.py",
         "hugo.toml",
         "layouts/baseof.html",
