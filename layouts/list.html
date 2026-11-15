@@ -1,8 +1,17 @@
 {{ define "main" }}
-<h1>{{ .Title }}</h1>
-<ul>
-{{ range .Pages }}
-  <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-{{ end }}
+<h1 class="page-title">{{ if eq .Kind "term" }}#{{ end }}{{ .Title }}</h1>
+{{- with .Content }}
+<div class="intro">{{ . }}</div>
+{{- end }}
+{{- if eq .Kind "taxonomy" }}
+<ul class="terms">
+  {{- range .Pages.ByTitle }}
+  <li><a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a> <span class="n">{{ len .Pages }}</span></li>
+  {{- end }}
 </ul>
+{{- else if eq .Section "toys" }}
+{{ partial "toys.html" .Pages.ByDate.Reverse }}
+{{- else }}
+{{ partial "posts.html" .Pages.ByDate.Reverse }}
+{{- end }}
 {{ end }}

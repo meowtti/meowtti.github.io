@@ -1,0 +1,15 @@
+{{- /* 갈래 메뉴 — 순서는 여기 한 곳. 글이 하나도 없는 갈래는 메뉴에 안 나온다. */ -}}
+{{- $cur := . -}}
+{{- $secs := slice -}}
+{{- range slice "toys" "art" "posts" -}}
+  {{- with site.GetPage (printf "/%s" .) -}}
+    {{- if .Pages }}{{ $secs = $secs | append . }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- with $secs }}
+<nav>
+  {{- range . }}
+  <a href="{{ .RelPermalink }}"{{ if eq $cur . }} aria-current="page"{{ else if $cur.IsDescendant . }} aria-current="true"{{ end }}>{{ .Title }}</a>
+  {{- end }}
+</nav>
+{{- end }}

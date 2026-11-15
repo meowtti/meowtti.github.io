@@ -1,0 +1,2 @@
+{{- /* 날짜 꼴 한 곳(한국어 규범 「2026. 11. 3.」). 날짜가 없으면 아무것도 안 찍는다. */ -}}
+{{- if not .Date.IsZero }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006. 1. 2." }}</time>{{ end -}}

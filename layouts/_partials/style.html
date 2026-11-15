@@ -1,0 +1,102 @@
+{{- /* 모양 한 곳 — 「옛 홈피」 틀(남색 머리 띠 · 하얀 판 · 돋움) + 「진열장」(놀이는 큰 그림 격자). 2026-11-15 주인 고름(AB).
+       바깥 글꼴 · 꾸밈 라이브러리 없이 시스템 글꼴. 색은 아래 변수만 고친다. 옛 홈피 결이라 늘 밝은 판. */ -}}
+<style>
+:root {
+  --bg: #dfe5ee;
+  --panel: #ffffff;
+  --ink: #222222;
+  --mute: #5d6675;
+  --line: #a9b4c6;
+  --link: #1a44a8;
+  --seen: #6a3aa0;
+  --bar: #34558f;
+  --bar-dark: #1f3766;
+  --bar-light: #5b7bb5;
+  --head: #edf1f8;
+  --tag-bg: #fff8d6;
+  --tag-line: #d9c46a;
+  --tag-ink: #6b5a12;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0 auto;
+  max-width: 58rem;
+  padding: 1.5rem 1rem 3rem;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.65 "Dotum", "돋움", "Gulim", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+a { color: var(--link); text-underline-offset: .2em; }
+a:visited { color: var(--seen); }
+
+.top {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: .25rem 1.5rem;
+  margin-bottom: .75rem; padding: .9rem 1.1rem;
+  background: var(--bar); border: 1px solid var(--bar-dark);
+  box-shadow: inset 0 1px 0 var(--bar-light);
+}
+.name, a.name:visited { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; }
+.top nav { display: flex; gap: 1.1rem; }
+.top nav a, .top nav a:visited { color: #c9d6f0; text-decoration: none; }
+.top nav a[aria-current] { color: #fff; text-decoration: underline; }
+
+main { background: var(--panel); border: 1px solid var(--line); padding: 1.1rem 1.25rem 1.5rem; }
+h1 { font-size: 1.4rem; line-height: 1.35; margin: 0 0 .5rem; }
+h2, .page-title {
+  margin: 1.75rem 0 .75rem; padding: .25rem .6rem; font-size: .95rem;
+  background: var(--head); border: 1px solid var(--line); border-left: 4px solid var(--bar);
+}
+.page-title { margin-top: 0; font-size: 1rem; }
+section:first-of-type h2 { margin-top: .5rem; }
+.intro { margin-bottom: 1rem; }
+.meta { color: var(--mute); margin-top: 0; }
+
+.toys, .posts { list-style: none; margin: 0; padding: 0; }
+.toys { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem 1rem; }
+.toys li { display: flex; flex-direction: column; gap: .45rem; }
+.toys .thumb { line-height: 0; }
+.toys img {
+  width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover;
+  border: 1px solid #7f8da6; background: var(--head);
+  transition: transform .15s;
+}
+.toys .thumb:hover img { transform: translateY(-3px); }
+.toys .t { font-size: 1.05rem; font-weight: 700; }
+.toys p { margin: .2rem 0 0; color: var(--mute); }
+.tags-row { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .2rem; }
+.tag {
+  display: inline-block; padding: 0 .35rem;
+  background: var(--tag-bg); border: 1px solid var(--tag-line); color: var(--tag-ink);
+  font-size: .8rem; line-height: 1.5;
+}
+
+.posts li { display: flex; gap: 1rem; padding: .4rem 0; border-top: 1px dotted var(--line); }
+.posts time { flex: none; color: var(--mute); font-variant-numeric: tabular-nums; }
+.more { margin: .75rem 0 0; }
+.terms { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
+.terms .n { color: var(--mute); font-size: .85rem; }
+
+article img { max-width: 100%; height: auto; }
+.tags a { margin-right: .4rem; }
+.note { color: var(--mute); font-size: .9rem; }
+.pn { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px dotted var(--line); }
+.pn a[rel="next"] { margin-left: auto; text-align: right; }
+
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+footer { margin-top: 1.5rem; color: var(--mute); font-size: .85rem; text-align: center; }
+footer p { margin: .3rem 0; }
+footer a, footer a:visited { color: var(--mute); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toys img { transition: none; }
+  .toys .thumb:hover img { transform: none; }
+}
+</style>

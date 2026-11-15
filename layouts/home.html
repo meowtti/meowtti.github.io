@@ -1,8 +1,24 @@
 {{ define "main" }}
-<h1>{{ site.Title }}</h1>
-<ul>
-{{ range where site.RegularPages "Section" "posts" }}
-  <li><time>{{ .Date.Format "2006년 1월 2일" }}</time> <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-{{ end }}
-</ul>
+{{- /* 첫 화면에 보일 개수 — 넘으면 「전부 보기」가 붙는다. */ -}}
+{{- $show := dict "toys" 6 "art" 6 "posts" 10 }}
+{{- with .Content }}
+<div class="intro">{{ . }}</div>
+{{- end }}
+
+{{- range slice "toys" "art" "posts" }}
+{{- $n := index $show . }}
+{{- with site.GetPage (printf "/%s" .) }}{{ $sec := . }}{{ with .Pages.ByDate.Reverse }}
+<section>
+  <h2>{{ $sec.Title }}</h2>
+  {{- if eq $sec.Section "toys" }}
+  {{ partial "toys.html" (first $n .) }}
+  {{- else }}
+  {{ partial "posts.html" (first $n .) }}
+  {{- end }}
+  {{- if gt (len .) $n }}
+  <p class="more"><a href="{{ $sec.RelPermalink }}">{{ $sec.Title }} 전부 보기 ({{ len . }})</a></p>
+  {{- end }}
+</section>
+{{- end }}{{ end }}
+{{- end }}
 {{ end }}

@@ -1,0 +1,6 @@
+{{- /* 글 목록 한 곳 — 받는 것: 글들(날짜 순서는 부르는 쪽이 정함). */ -}}
+<ul class="posts">
+{{- range . }}
+  <li>{{ partial "date.html" . }} <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+{{- end }}
+</ul>

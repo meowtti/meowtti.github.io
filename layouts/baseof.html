@@ -3,14 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ .Title }} · {{ site.Title }}</title>
-{{ with site.Home.OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}">{{ end }}
+<meta name="color-scheme" content="light">
+{{- $title := .Title }}{{ if eq .Kind "404" }}{{ $title = "찾는 페이지가 없습니다" }}{{ end }}
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ $title }} · {{ site.Title }}{{ end }}</title>
+{{- /* 링크 미리 보기(카톡 등) — 설명: 이 페이지 설명 → 글이면 요약 → 사이트 설명. 그림: 이 페이지 그림 → 사이트 대표 그림 → 첫 화면이면 최근 놀이 썸네일 */}}
+{{- $desc := .Description }}
+{{- if and (not $desc) .IsPage }}{{ $desc = .Summary | plainify | strings.TrimSpace | truncate 120 }}{{ end }}
+{{- if not $desc }}{{ $desc = site.Params.description }}{{ end }}
+{{- with $desc }}
+<meta name="description" content="{{ . }}">
+<meta property="og:description" content="{{ . }}">
+{{- end }}
+<meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ $title }}{{ end }}">
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:locale" content="ko_KR">
+{{- $img := or .Params.image site.Params.image }}
+{{- if and (not $img) .IsHome }}{{ with site.GetPage "/toys" }}{{ range first 1 .Pages.ByDate.Reverse }}{{ $img = .Params.thumb }}{{ end }}{{ end }}{{ end }}
+{{- with $img }}
+<meta property="og:image" content="{{ . | absURL }}">
+{{- end }}
+{{- with site.Home.OutputFormats.Get "rss" }}
+<link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="{{ .RelPermalink }}">
+{{- end }}
+{{ partial "style.html" . }}
 {{- if hugo.IsProduction }}{{ with site.Params.analytics }}
 <script type="module" src="{{ .src }}" integrity="{{ .sri }}" crossorigin="anonymous" data-cf-beacon='{"token": "{{ .site }}"}'></script>
 {{- end }}{{ end }}
 </head>
 <body>
-<header><a href="/">{{ site.Title }}</a></header>
+<header class="top">
+  {{- if .IsHome }}
+  <h1 class="name">{{ site.Title }}</h1>
+  {{- else }}
+  <a class="name" href="{{ "/" | relURL }}">{{ site.Title }}</a>
+  {{- end }}
+  {{ partial "nav.html" . }}
+</header>
 <main>{{ block "main" . }}{{ end }}</main>
+<footer>
+  <p>따로 밝힌 것을 빼고, 이 사이트의 글과 그림, 놀이는 <a rel="license" href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko">CC BY-NC 4.0</a>을 따릅니다.
+  출처를 밝히면 자유롭게 나누고 고쳐 써도 되지만, 영리 목적으로는 쓸 수 없습니다.</p>
+  {{- with site.Home.OutputFormats.Get "rss" }}
+  <p><a href="{{ .RelPermalink }}">RSS</a></p>
+  {{- end }}
+</footer>
 </body>
 </html>

@@ -1,0 +1,33 @@
+{{- /* 피드 한 곳 — 첫 화면 피드엔 놀이 · 그림 · 일지를 다 섞는다. 놀이는 제 페이지가 없으니 링크를 본체 자리로 직접 만든다. */ -}}
+{{- $pages := slice -}}
+{{- if .IsHome -}}
+  {{- range slice "toys" "art" "posts" -}}
+    {{- with site.GetPage (printf "/%s" .) }}{{ range .Pages }}{{ $pages = $pages | append . }}{{ end }}{{ end -}}
+  {{- end -}}
+{{- else -}}
+  {{- range .Pages }}{{ $pages = $pages | append . }}{{ end -}}
+{{- end -}}
+{{- $pages = first 30 (sort $pages "Date" "desc") -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+  <link>{{ .Permalink }}</link>
+  <description>{{ site.Title }}</description>
+  <language>ko</language>
+  {{- with .OutputFormats.Get "rss" }}
+  <atom:link href="{{ .Permalink }}" rel="self" type="application/rss+xml"/>
+  {{- end }}
+  {{- range $pages }}
+  {{- $link := .Permalink }}
+  {{- if eq .Section "toys" }}{{ $link = printf "/toys/%s/" .File.ContentBaseName | absURL }}{{ end }}
+  <item>
+    <title>{{ .Title | transform.XMLEscape | safeHTML }}</title>
+    <link>{{ $link }}</link>
+    <guid>{{ $link }}</guid>
+    <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
+    <description>{{ with .Description }}{{ . | transform.XMLEscape | safeHTML }}{{ else }}{{ .Summary | transform.XMLEscape | safeHTML }}{{ end }}</description>
+  </item>
+  {{- end }}
+</channel>
+</rss>

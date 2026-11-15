@@ -54,6 +54,12 @@ def test_home_page_built(built):
     assert "야옹띠의 놀이터" in html
 
 
+def _site_pages(built: Path) -> list[Path]:
+    """Hugo가 틀로 만든 페이지만 — static/에서 그대로 복사된 놀이 본체는 뺀다(바이트 그대로가 원칙)."""
+    static = ROOT / "static"
+    return [p for p in built.rglob("*.html") if not (static / p.relative_to(built)).exists()]
+
+
 def _analytics() -> dict:
     return tomllib.loads((ROOT / "hugo.toml").read_text(encoding="utf-8"))["params"]["analytics"]
 
@@ -73,7 +79,7 @@ def test_only_pinned_analytics_script_outside(built):
 
 def test_analytics_on_every_page_in_production(built):
     site = _analytics()["site"]
-    pages = list(built.rglob("*.html"))
+    pages = _site_pages(built)
     assert pages
     for p in pages:
         assert site in p.read_text(encoding="utf-8"), f"{p.name}: 통계 줄이 빠짐"
@@ -106,6 +112,105 @@ def test_drafts_not_built(built):
             title = tomllib.loads(head[1])["title"]
             for p in built.rglob("*.html"):
                 assert title not in p.read_text(encoding="utf-8"), f"초안 「{title}」이 {p}에 나옴"
+
+
+def test_home_title_not_doubled(built):
+    html = (built / "index.html").read_text(encoding="utf-8")
+    m = re.search(r"<title>(.*?)</title>", html)
+    assert m, "첫 화면에 <title>이 없음"
+    assert m.group(1) == "야옹띠의 놀이터", f"첫 화면 탭 제목 = {m.group(1)!r} — 사이트 이름 한 번만"
+
+
+def test_license_line_on_every_page(built):
+    for p in _site_pages(built):
+        text = p.read_text(encoding="utf-8")
+        assert "creativecommons.org/licenses/by-nc/4.0" in text, f"{p}: 바닥글 라이선스 줄이 빠짐(README 표)"
+        assert "따로 밝힌 것을 빼고" in text, (
+            f"{p}: 남의 소재(놀이 속 사진 · 소리 등)를 라이선스에서 빼는 말이 빠짐"
+        )
+
+
+def _front(md: Path) -> dict:
+    parts = md.read_text(encoding="utf-8").split("+++")
+    return tomllib.loads(parts[1]) if len(parts) >= 3 else {}
+
+
+def _toy_entries() -> list[Path]:
+    d = ROOT / "content" / "toys"
+    return [p for p in d.glob("*.md") if p.name != "_index.md"] if d.exists() else []
+
+
+def test_every_toy_entry_points_at_real_files():
+    for md in _toy_entries():
+        slug = md.stem
+        assert (ROOT / "static" / "toys" / slug / "index.html").is_file(), (
+            f"content/toys/{md.name} 이(가) 가리키는 static/toys/{slug}/index.html 이 없음 — 놀이 폴더 이름 = 목록 파일 이름"
+        )
+        front = _front(md)
+        for key in ("title", "date", "description"):
+            assert front.get(key), f"content/toys/{md.name}: {key} 칸이 비었음"
+        thumb = front.get("thumb")
+        if thumb:
+            assert (ROOT / "static" / thumb.lstrip("/")).is_file(), (
+                f"content/toys/{md.name}: 그림 {thumb} 이 static에 없음"
+            )
+
+
+def test_toy_links_open_in_new_window(built):
+    found = 0
+    for p in built.rglob("*.html"):
+        for tag in re.findall(r'<a\b[^>]*href="?/toys/[^"\s>]+/"?[^>]*>', p.read_text(encoding="utf-8")):
+            found += 1
+            assert 'target="_blank"' in tag or "target=_blank" in tag, f"{p}: 놀이 링크가 새 창이 아님 {tag}"
+            assert "noopener" in tag, f"{p}: 새 창 링크에 noopener가 없음 {tag}"
+    assert found >= len(_toy_entries()), "목록 파일보다 놀이 링크가 적음"
+
+
+def test_toy_entries_have_no_page_of_their_own(built):
+    for md in _toy_entries():
+        page = built / "toys" / md.stem / "index.html"
+        src = ROOT / "static" / "toys" / md.stem / "index.html"
+        assert page.read_bytes() == src.read_bytes(), f"{md.name}: 목록 항목이 놀이 자리에 페이지를 덮어씀"
+
+
+def test_no_hugo_default_english_or_empty_dates(built):
+    for p in _site_pages(built):
+        text = p.read_text(encoding="utf-8")
+        assert "0001" not in re.sub(r"<script.*?</script>", "", text, flags=re.S), (
+            f"{p}: 빈 날짜(0001년)가 보임"
+        )
+        assert "<h1>Tags</h1>" not in text, f"{p}: Hugo 기본 영어 제목"
+        assert 'name="generator"' not in text, f"{p}: 생성기 판 표시 — hugo.toml disableHugoGeneratorInject"
+
+
+def test_korean_404_page(built):
+    page = built / "404.html"
+    assert page.is_file(), "404.html 이 없음 — GitHub Pages가 영어 기본 404를 띄운다"
+    text = page.read_text(encoding="utf-8")
+    assert 'href="/"' in text, "404에 첫 화면으로 가는 링크가 없음"
+    assert "Page not found" not in text, "404 탭 제목 · og 제목이 Hugo 기본 영어"
+
+
+def test_home_link_preview_has_image(built):
+    html = (built / "index.html").read_text(encoding="utf-8")
+    if _toy_entries() or tomllib.loads((ROOT / "hugo.toml").read_text(encoding="utf-8"))["params"].get(
+        "image"
+    ):
+        assert 'property="og:image"' in html, (
+            "첫 화면 링크 미리 보기에 그림이 없음(대표 그림 또는 최근 놀이 썸네일)"
+        )
+
+
+def test_feeds_have_links_and_korean(built):
+    feeds = list(built.rglob("index.xml"))
+    assert feeds
+    for f in feeds:
+        text = f.read_text(encoding="utf-8")
+        assert "Recent content" not in text and " on " not in text, f"{f}: Hugo 기본 영어 피드 문구"
+        assert "<language>ko</language>" in text, f"{f}: 피드 언어가 ko가 아님"
+        for item in re.findall(r"<item>.*?</item>", text, flags=re.S):
+            link = re.search(r"<link>(.*?)</link>", item, flags=re.S)
+            assert link and link.group(1).strip().startswith("http"), f"{f}: 링크 빈 피드 항목 {item[:120]}"
 
 
 def test_toys_copied_byte_for_byte(built):
