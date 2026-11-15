@@ -187,6 +187,19 @@ def test_toy_links_open_in_new_window(built):
     assert found == hrefs, f"목록에 있는데 화면에 링크가 없는 놀이: {hrefs - found}"
 
 
+def test_fanart_toys_show_fanart_tag(built):
+    # 목록 파일은 제 페이지가 없어 single의 팬아트 알림이 안 뜬다 — 목록 칸에 「팬아트」 딱지가 떠야 한다
+    page = (built / "toys" / "index.html").read_text(encoding="utf-8")
+    for md in _toy_entries():
+        title = _front(md).get("title", "")
+        item = page.split(title, 1)[1].split("</li>", 1)[0] if title in page else ""
+        assert item, f"{md.name}: 목록에 항목이 없음"
+        if _front(md).get("fanart"):
+            assert ">팬아트<" in item, f"{md.name}: fanart = true인데 목록에 「팬아트」 딱지가 없음"
+        else:
+            assert ">팬아트<" not in item, f"{md.name}: 팬아트가 아닌데 딱지가 붙음"
+
+
 def test_toy_entries_have_no_page_of_their_own(built):
     for md in _toy_entries():
         if _front(md).get("link"):

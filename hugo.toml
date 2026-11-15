@@ -2,6 +2,8 @@ baseURL = "https://meowtti.github.io/"
 locale = "ko"
 title = "야옹띠의 놀이터"
 disableHugoGeneratorInject = true
+# 시간대 없이 적은 날짜(date = 2026-11-16)를 한국 자정으로 읽는다 — 없으면 UTC로 읽어, 한국 새벽에 올린 글이 「앞날 글」로 빠진다(2026-11-16 두 번째 놀이에서 걸림)
+timeZone = "Asia/Seoul"
 
 [params]
   github = "https://github.com/meowtti"
