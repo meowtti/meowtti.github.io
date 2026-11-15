@@ -1,6 +1,14 @@
 {{- /* 모양 한 곳 — 「옛 홈피」 틀(남색 머리 띠 · 하얀 판 · 돋움) + 「진열장」(놀이는 큰 그림 격자). 2026-11-15 주인 고름(AB).
        바깥 글꼴 · 꾸밈 라이브러리 없이 시스템 글꼴. 색은 아래 변수만 고친다. 옛 홈피 결이라 늘 밝은 판. */ -}}
 <style>
+/* 제목 글꼴 — 갈무리 굵게(픽셀풍 · SIL OFL 1.1 · static/fonts/ · 2.40.3판을 저장소에 복사). 폰 · 맥엔 돋움이 없어 옛 홈피 맛을 제목에서라도 지킴(2026-11-15 주인 고름 F2).
+   픽셀 글꼴은 설계 크기 11px의 배수에서만 또렷해서 11px · 22px만 쓴다. 본문은 기기 글꼴. */
+@font-face {
+  font-family: "Galmuri11";
+  font-weight: 700;
+  src: url("{{ "fonts/Galmuri11-Bold.woff2" | relURL }}") format("woff2");
+  font-display: swap;
+}
 :root {
   --bg: #dfe5ee;
   --panel: #ffffff;
@@ -39,7 +47,7 @@ a:visited { color: var(--seen); }
   background: var(--bar); border: 1px solid var(--bar-dark);
   box-shadow: inset 0 1px 0 var(--bar-light);
 }
-.name, a.name:visited { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; }
+.name, a.name:visited { margin: 0; font-size: 22px; font-weight: 700; color: #fff; text-decoration: none; }
 .top nav { display: flex; gap: 1.1rem; }
 .top nav a, .top nav a:visited { color: #c9d6f0; text-decoration: none; }
 .top nav a[aria-current] { color: #fff; text-decoration: underline; }
@@ -50,7 +58,10 @@ h2, .page-title {
   margin: 1.75rem 0 .75rem; padding: .25rem .6rem; font-size: .95rem;
   background: var(--head); border: 1px solid var(--line); border-left: 4px solid var(--bar);
 }
-.page-title { margin-top: 0; font-size: 1rem; }
+.page-title { margin-top: 0; }
+.name, h1, h2, .page-title, .toys .t { font-family: "Galmuri11", "Dotum", "돋움", sans-serif; font-weight: 700; }
+h2, .page-title, .toys .t { font-size: 11px; }
+article h1 { font-size: 22px; }
 section:first-of-type h2 { margin-top: .5rem; }
 .intro { margin-bottom: 1rem; }
 .meta { color: var(--mute); margin-top: 0; }
@@ -65,7 +76,6 @@ section:first-of-type h2 { margin-top: .5rem; }
   transition: transform .15s;
 }
 .toys .thumb:hover img { transform: translateY(-3px); }
-.toys .t { font-size: 1.05rem; font-weight: 700; }
 .toys p { margin: .2rem 0 0; color: var(--mute); }
 .tags-row { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .2rem; }
 .tag {

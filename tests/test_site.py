@@ -223,6 +223,20 @@ def test_github_profile_links_open_new_tab(built):
         assert "_blank" in t and "noopener" in t, f"깃허브 링크가 새 탭 · noopener가 아님 {t}"
 
 
+def test_fonts_ship_with_their_license(built):
+    css = (built / "index.html").read_text(encoding="utf-8")
+    for url in re.findall(r"url\(\"?/?(fonts/[^\")]+)", css):
+        assert (built / url).is_file(), f"글꼴 {url} 이 굽기에 없음"
+    fonts = list((ROOT / "static" / "fonts").glob("*.woff2")) if (ROOT / "static" / "fonts").exists() else []
+    for f in fonts:
+        lic = list(f.parent.glob("*OFL*.txt"))
+        assert lic, f"{f.name}: 글꼴 옆에 라이선스 원문(OFL)이 없음 — OFL 조건 2"
+    if fonts:
+        assert "static/fonts/" in (ROOT / "README.md").read_text(encoding="utf-8"), (
+            "README 라이선스 표에 글꼴 폴더를 CC에서 빼는 줄이 없음 — OFL 조건 5"
+        )
+
+
 def test_icons_linked_and_present(built):
     html = (built / "index.html").read_text(encoding="utf-8")
     for name in ("favicon-32.png", "apple-touch-icon.png"):

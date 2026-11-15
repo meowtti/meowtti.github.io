@@ -21,7 +21,8 @@ uv run --frozen pytest
 
 | 무엇 | 조건 |
 |---|---|
-| 콘텐츠 — `content/`의 글, `static/`의 놀이 · 그림 | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.ko) — 출처(야옹띠의 놀이터 · 링크)를 밝히면 나누고 고쳐 쓸 수 있습니다. 영리 목적으로는 쓸 수 없습니다. |
+| 콘텐츠 — `content/`의 글, `static/`의 놀이 · 그림 (`static/fonts/` 빼고) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.ko) — 출처(야옹띠의 놀이터 · 링크)를 밝히면 나누고 고쳐 쓸 수 있습니다. 영리 목적으로는 쓸 수 없습니다. |
+| 글꼴 — `static/fonts/Galmuri11-Bold.woff2` ([갈무리](https://galmuri.quiple.dev) 2.40.3 · 제목에만 씀) | 원작자의 [SIL Open Font License 1.1](static/fonts/Galmuri-OFL.txt) — 이 저장소의 다른 라이선스가 적용되지 않습니다. |
 | 그 밖의 코드 — 틀(`layouts/`) · 검사기(`checks/`) · 시험 · 설정 | 별도 라이선스를 주지 않습니다(모든 권리 보유). 보고 배우는 것은 자유입니다. |
 
 팬아트에 나오는 원작 캐릭터 · 이름 · 로고의 권리는 원작자에게 있습니다. 위 라이선스는 그 부분에 적용되지 않습니다.
